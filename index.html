@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <canvas id="myCanvas" width="750" height="450"></canvas>
+
+    <canvas id="coinAnimation"></canvas>
+
+    <script>
+
+
+        var canvas = document.getElementById("myCanvas");
+        var coinCanvas = document.getElementById("coinAnimation");
+        var ctx = canvas.getContext("2d");
+
+        var charHeight = 75;
+        var charWidth = 75;
+        var charX = (canvas.width - charWidth) / 2;
+
+        var coinImage = new Image();
+        coinImage.src = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Items/spinning_coin_sprite.png";
+
+        var coin = sprite({
+            context: canvas.getContext("2d"),
+            width: 200,
+            height: 200,
+            image: coinImage
+        });
+
+        function sprite(options) {
+            debugger
+            var that = {};
+
+            that.context = options.context;
+            that.width = options.width;
+            that.height = options.height;
+            that.image = options.image;
+
+            that.render = function () {
+                debugger
+                // Draw the animation
+                that.context.drawImage(
+                    that.image,
+                    0,
+                    0,
+                    that.width,
+                    that.height,
+                    0,
+                    0,
+                    that.width,
+                    that.height);
+            };
+
+            return that;
+        }
+
+        var x = canvas.width / 2;
+        var y = canvas.height - 30;
+
+        var dx = 2;
+        var dy = -2;
+
+        var rightPressed = false;
+        var leftPressed = false;
+
+
+        function drawChar() {
+            ctx.beginPath();
+            ctx.rect(charX, canvas.height - charHeight, charWidth, charHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawChar();
+            coin.render();
+            // collisionDetection();
+
+            if (rightPressed) {
+                charX += 7;
+            }
+            else if (leftPressed) {
+                charX -= 7;
+            }
+
+            // if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+            //     dx = -dx;
+            // }
+
+
+            x += dx;
+            y += dy;
+
+            requestAnimationFrame(draw);
+
+        }
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+        document.addEventListener("mousemove", mouseMoveHandler, false);
+
+
+        function keyDownHandler(e) {
+            if (e.key == "Right" || e.key == "ArrowRight") {
+                rightPressed = true;
+            }
+            else if (e.key == "Left" || e.key == "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key == "Right" || e.key == "ArrowRight") {
+                rightPressed = false;
+            }
+            else if (e.key == "Left" || e.key == "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
+
+        function mouseMoveHandler(e) {
+            var relativeX = e.clientX - canvas.offsetLeft;
+            if (relativeX > 0 && relativeX < canvas.width) {
+                charX = relativeX - charWidth / 2;
+            }
+        }
+
+        draw();
+
+
+    </script>
+
+</body>
+
+</html>
