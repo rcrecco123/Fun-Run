@@ -5,141 +5,247 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script>
+
+    </script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script> -->
     <title>Document</title>
 </head>
 
 <body>
 
-    <canvas id="myCanvas" width="750" height="450"></canvas>
+    <canvas id="myCanvas" width="1000" height="450" style="border: 1px solid black;">
+        <img src="/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg" id="img" style="width: 100%;
+                height: 100%;">
 
-    <canvas id="coinAnimation"></canvas>
+    </canvas>
+
 
     <script>
 
-
         var canvas = document.getElementById("myCanvas");
-        var coinCanvas = document.getElementById("coinAnimation");
         var ctx = canvas.getContext("2d");
 
-        var charHeight = 75;
-        var charWidth = 75;
-        var charX = (canvas.width - charWidth) / 2;
+        // SCROLLING BACKGROUND CODE
 
-        var coinImage = new Image();
-        coinImage.src = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Items/spinning_coin_sprite.png";
+        var img = document.getElementsByTagName('img')[0];
+        var velocity = 325; //100pixels/second
+        var distance = 0;
+        var lastFrameRepaintTime = 0;
 
-        var coin = sprite({
-            context: canvas.getContext("2d"),
-            width: 200,
-            height: 200,
-            image: coinImage
-        });
-
-        function sprite(options) {
-            debugger
-            var that = {};
-
-            that.context = options.context;
-            that.width = options.width;
-            that.height = options.height;
-            that.image = options.image;
-
-            that.render = function () {
-                debugger
-                // Draw the animation
-                that.context.drawImage(
-                    that.image,
-                    0,
-                    0,
-                    that.width,
-                    that.height,
-                    0,
-                    0,
-                    that.width,
-                    that.height);
-            };
-
-            return that;
+        function calcOffset(time) {
+            var frameGapTime = time - lastFrameRepaintTime;
+            lastFrameRepaintTime = time;
+            var translateX = velocity * (frameGapTime / 1000); //100px per frame
+            return translateX;
         }
-
-        var x = canvas.width / 2;
-        var y = canvas.height - 30;
-
-        var dx = 2;
-        var dy = -2;
-
-        var rightPressed = false;
-        var leftPressed = false;
-
-
-        function drawChar() {
-            ctx.beginPath();
-            ctx.rect(charX, canvas.height - charHeight, charWidth, charHeight);
-            ctx.fillStyle = "#0095DD";
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        function draw() {
+        function draw(time) {
+            distance += calcOffset(time);
+            if (distance > img.width) {
+                distance = 0;
+            }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawChar();
-            coin.render();
-            // collisionDetection();
-
-            if (rightPressed) {
-                charX += 7;
-            }
-            else if (leftPressed) {
-                charX -= 7;
-            }
-
-            // if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-            //     dx = -dx;
-            // }
-
-
-            x += dx;
-            y += dy;
+            ctx.save();
+            ctx.translate(-distance, 0);
+            ctx.drawImage(img, 0, 0)
+            ctx.drawImage(img, img.width - 1, 0);
 
             requestAnimationFrame(draw);
 
+            ctx.restore();
+
         }
 
-        document.addEventListener("keydown", keyDownHandler, false);
-        document.addEventListener("keyup", keyUpHandler, false);
-        document.addEventListener("mousemove", mouseMoveHandler, false);
+        function start() {
+            lastFrameRepaintTime = window.performance.now();
+            requestAnimationFrame(draw);
+        }
+
+        //UTILITY FUNCTIONS
+
+        function getDistance(x1, y1, x2, y2) {
+            let xDistance = x2 - x1; //x distance between two points
+            let yDistance = y2 - y1; //y distance between two points
+
+            return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+        }
 
 
-        function keyDownHandler(e) {
-            if (e.key == "Right" || e.key == "ArrowRight") {
-                rightPressed = true;
+        //PLATFORM CODE
+
+        var platformX = 1300; //x
+        var platformY = Math.random(100, 200); //y
+
+        function PlatformObj(x, y) {
+
+            var platformPath = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Platforms and Obstacles/Platform_2.png";
+            var platformSprite = new Image();
+            platformSprite.src = platformPath;
+
+            platformX -= 20;
+
+
+            this.x = x;
+            this.y = y
+
+            this.update = () => {
+                this.draw();
             }
-            else if (e.key == "Left" || e.key == "ArrowLeft") {
-                leftPressed = true;
+            this.draw = () => {
+                ctx.beginPath();
+                ctx.drawImage(platformSprite, x, y);
+                ctx.fill();
+                ctx.closePath();
+            }
+
+        }
+
+        //JUMPING RECTANGLE CODE
+
+        rectangle = {
+            height: 32,
+            jumping: true,
+            jumps: 0,
+            width: 32,
+            x: 100,
+            x_velocity: 0,
+            y: 100,
+            y_velocity: 0
+        }
+
+        controller = {
+            up: false,
+            left: false,
+            down: false,
+            right: false,
+            fire: false,
+            keyListener: function (event) {
+                var key_state = (event.type == "keydown") ? true : false;
+
+                switch (event.keyCode) {
+                    case 38:
+                        controller.up = key_state;
+                        break;
+                    case 32:
+                        controller.up = key_state;
+                        break;
+                    case 13:
+                        controller.fire = key_state;
+                        break;
+                }
             }
         }
 
-        function keyUpHandler(e) {
-            if (e.key == "Right" || e.key == "ArrowRight") {
-                rightPressed = false;
-            }
-            else if (e.key == "Left" || e.key == "ArrowLeft") {
-                leftPressed = false;
-            }
+        var megamanSprite = {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 50,
         }
 
-        function mouseMoveHandler(e) {
-            var relativeX = e.clientX - canvas.offsetLeft;
-            if (relativeX > 0 && relativeX < canvas.width) {
-                charX = relativeX - charWidth / 2;
-            }
+        function handleMegaman() {
+
         }
 
-        draw();
+        loop = function () {
 
+
+            if (controller.up && rectangle.jumping == false) {
+                rectangle.y_velocity -= 40;
+                rectangle.jumping = true;
+                rectangle.jumps += 1;
+            }
+
+            rectangle.y_velocity += 2.5; //gravity
+            rectangle.y += rectangle.y_velocity;
+            rectangle.y_velocity *= 0.9; //friction
+            //FLOOR COLLISION
+            if (rectangle.y > 300) {
+                rectangle.jumping = false;
+                rectangle.y = 300;
+                rectangle.y_velocity = 0;
+            }
+
+            //PLATFORM COLLISION
+            platform1 = new PlatformObj(platformX, platformY);
+
+            platform1.update();
+
+
+            if (rectangle.x > platformX && rectangle.x < platformX + 200) {
+                rectangle.y == 600;
+                rectangle.y_velocity = 0;
+            }
+
+            // var megaman = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Characters/link.png";
+            // var megamanSprite = new Image();
+            // megamanSprite.src = megaman;
+
+
+            // var spriteX = 238;
+
+            // ctx.beginPath();
+            // ctx.drawImage(megamanSprite, spriteX, 119, 25, 25, rectangle.x, rectangle.y, 50, 50);
+            // ctx.fill();
+
+            // spriteX += 10;
+
+            window.requestAnimationFrame(loop);
+
+        }
+
+
+        // LINK SPRITE LOGIC
+
+        let spriteX = 235;
+
+        let spriteTime = 0;
+
+        function drawLink() {
+            var megaman = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Characters/link.png";
+            var megamanSprite = new Image();
+            megamanSprite.src = megaman;
+
+            ctx.beginPath();
+            ctx.drawImage(megamanSprite, spriteX, 119, 25, 25, rectangle.x, rectangle.y, 50, 50);
+            ctx.fill();
+
+
+            if (spriteX >= 355) {
+                spriteX = 235;
+            }
+
+            else if (spriteTime >= 10) {
+                spriteX += 60;
+                spriteTime = 0;
+            }
+
+            spriteTime += 1;
+
+
+
+            window.requestAnimationFrame(drawLink);
+        }
+
+
+        //EVENT LISTENERS
+
+        document.addEventListener("keydown", controller.keyListener);
+        document.addEventListener("keyup", controller.keyListener);
+        // document.addEventListener("mousemove", mouseMoveHandler, false);
+
+
+        start();
+        drawLink();
+        loop();
 
     </script>
 
 </body>
 
 </html>
+
+
+<!-- if the sprites bottom (top left corner - height), is a the same X as the platform,
+and the sprites bottom is also between the platforms top left and top right points -->
