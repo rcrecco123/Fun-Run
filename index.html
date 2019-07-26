@@ -2,250 +2,278 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-    <script>
-
-    </script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script> -->
-    <title>Document</title>
+  <script></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script> -->
+  <title>Document</title>
 </head>
 
 <body>
+  <canvas id="myCanvas" width="1000" height="450" style="border: 1px solid black;">
+    <img src="/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg" id="img" style="width: 100%;
+                height: 100%;" />
+  </canvas>
 
-    <canvas id="myCanvas" width="1000" height="450" style="border: 1px solid black;">
-        <img src="/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg" id="img" style="width: 100%;
-                height: 100%;">
+  <script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
 
-    </canvas>
+    // SCROLLING BACKGROUND CODE
 
+    var img = document.getElementsByTagName("img")[0];
+    var velocity = 425; //100pixels/second
+    var distance = 0;
+    var lastFrameRepaintTime = 0;
 
-    <script>
+    function calcOffset(time) {
+      var frameGapTime = time - lastFrameRepaintTime;
+      lastFrameRepaintTime = time;
+      var translateX = velocity * (frameGapTime / 1000); //100px per frame
+      return translateX;
+    }
+    function draw(time) {
+      distance += calcOffset(time);
+      if (distance > img.width) {
+        distance = 0;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(-distance, 0);
+      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, img.width - 1, 0);
 
-        var canvas = document.getElementById("myCanvas");
-        var ctx = canvas.getContext("2d");
+      requestAnimationFrame(draw);
 
-        // SCROLLING BACKGROUND CODE
+      ctx.restore();
+    }
 
-        var img = document.getElementsByTagName('img')[0];
-        var velocity = 325; //100pixels/second
-        var distance = 0;
-        var lastFrameRepaintTime = 0;
+    function start() {
+      lastFrameRepaintTime = window.performance.now();
+      requestAnimationFrame(draw);
+    }
 
-        function calcOffset(time) {
-            var frameGapTime = time - lastFrameRepaintTime;
-            lastFrameRepaintTime = time;
-            var translateX = velocity * (frameGapTime / 1000); //100px per frame
-            return translateX;
+    //UTILITY FUNCTIONS
+
+    function getDistance(x1, y1, x2, y2) {
+      let xDistance = x2 - x1; //x distance between two points
+      let yDistance = y2 - y1; //y distance between two points
+
+      return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+    }
+
+    //PLATFORM CODE
+
+    function PlatformObj(x, y) {
+      var platformPath =
+        "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Platforms and Obstacles/Platform_2.png";
+      var platformSprite = new Image();
+      platformSprite.src = platformPath;
+
+      platformX -= 6;
+
+      this.x = x;
+      this.y = y;
+
+      this.update = () => {
+        this.draw();
+      };
+      this.draw = () => {
+        ctx.beginPath();
+        ctx.drawImage(platformSprite, x, y, 400, 55);
+        ctx.fill();
+        ctx.closePath();
+      };
+    }
+
+    //JUMPING RECTANGLE CODE
+
+    rectangle = {
+      height: 32,
+      jumping: true,
+      jumps: 0,
+      width: 32,
+      x: 100,
+      x_velocity: 0,
+      y: 100,
+      y_velocity: 0
+    };
+
+    controller = {
+      up: false,
+      left: false,
+      down: false,
+      right: false,
+      fire: false,
+      keyListener: function (event) {
+        var key_state = event.type == "keydown" ? true : false;
+
+        switch (event.keyCode) {
+          case 38:
+            controller.up = key_state;
+            break;
+          case 32:
+            controller.up = key_state;
+            break;
+          case 13:
+            controller.fire = key_state;
+            break;
         }
-        function draw(time) {
-            distance += calcOffset(time);
-            if (distance > img.width) {
-                distance = 0;
-            }
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(-distance, 0);
-            ctx.drawImage(img, 0, 0)
-            ctx.drawImage(img, img.width - 1, 0);
+      }
+    };
 
-            requestAnimationFrame(draw);
+    var megamanSprite = {
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50
+    };
 
-            ctx.restore();
+    function handleMegaman() { }
 
-        }
+    var platformX = 1000; //x
+    // var platformY = Math.floor(Math.random() * 350) + 125; //y
+    var platformY = 275;
 
-        function start() {
-            lastFrameRepaintTime = window.performance.now();
-            requestAnimationFrame(draw);
-        }
+    loop = function () {
+      if (controller.up && rectangle.jumping == false) {
+        rectangle.y_velocity -= 40;
+        rectangle.jumping = true;
+        rectangle.jumps += 1;
+      }
 
-        //UTILITY FUNCTIONS
+      rectangle.y_velocity += 2.9; //gravity
+      rectangle.y += rectangle.y_velocity;
+      rectangle.y_velocity *= 0.9; //friction
+      //FLOOR COLLISION
+      if (rectangle.y > 300) {
+        rectangle.jumping = false;
+        rectangle.y = 300;
+        rectangle.y_velocity = 0;
+      }
 
-        function getDistance(x1, y1, x2, y2) {
-            let xDistance = x2 - x1; //x distance between two points
-            let yDistance = y2 - y1; //y distance between two points
-
-            return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-        }
-
-
-        //PLATFORM CODE
-
-        var platformX = 1300; //x
-        var platformY = Math.random(100, 200); //y
-
-        function PlatformObj(x, y) {
-
-            var platformPath = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Platforms and Obstacles/Platform_2.png";
-            var platformSprite = new Image();
-            platformSprite.src = platformPath;
-
-            platformX -= 20;
-
-
-            this.x = x;
-            this.y = y
-
-            this.update = () => {
-                this.draw();
-            }
-            this.draw = () => {
-                ctx.beginPath();
-                ctx.drawImage(platformSprite, x, y);
-                ctx.fill();
-                ctx.closePath();
-            }
-
-        }
-
-        //JUMPING RECTANGLE CODE
-
-        rectangle = {
-            height: 32,
-            jumping: true,
-            jumps: 0,
-            width: 32,
-            x: 100,
-            x_velocity: 0,
-            y: 100,
-            y_velocity: 0
-        }
-
-        controller = {
-            up: false,
-            left: false,
-            down: false,
-            right: false,
-            fire: false,
-            keyListener: function (event) {
-                var key_state = (event.type == "keydown") ? true : false;
-
-                switch (event.keyCode) {
-                    case 38:
-                        controller.up = key_state;
-                        break;
-                    case 32:
-                        controller.up = key_state;
-                        break;
-                    case 13:
-                        controller.fire = key_state;
-                        break;
-                }
-            }
-        }
-
-        var megamanSprite = {
-            x: 0,
-            y: 0,
-            width: 50,
-            height: 50,
-        }
-
-        function handleMegaman() {
-
-        }
-
-        loop = function () {
-
-
-            if (controller.up && rectangle.jumping == false) {
-                rectangle.y_velocity -= 40;
-                rectangle.jumping = true;
-                rectangle.jumps += 1;
-            }
-
-            rectangle.y_velocity += 2.5; //gravity
-            rectangle.y += rectangle.y_velocity;
-            rectangle.y_velocity *= 0.9; //friction
-            //FLOOR COLLISION
-            if (rectangle.y > 300) {
-                rectangle.jumping = false;
-                rectangle.y = 300;
-                rectangle.y_velocity = 0;
-            }
-
-            //PLATFORM COLLISION
-            platform1 = new PlatformObj(platformX, platformY);
-
-            platform1.update();
-
-
-            if (rectangle.x > platformX && rectangle.x < platformX + 200) {
-                rectangle.y == 600;
-                rectangle.y_velocity = 0;
-            }
-
-            // var megaman = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Characters/link.png";
-            // var megamanSprite = new Image();
-            // megamanSprite.src = megaman;
-
-
-            // var spriteX = 238;
-
-            // ctx.beginPath();
-            // ctx.drawImage(megamanSprite, spriteX, 119, 25, 25, rectangle.x, rectangle.y, 50, 50);
-            // ctx.fill();
-
-            // spriteX += 10;
-
-            window.requestAnimationFrame(loop);
-
-        }
-
-
-        // LINK SPRITE LOGIC
-
-        let spriteX = 235;
-
-        let spriteTime = 0;
-
-        function drawLink() {
-            var megaman = "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Characters/link.png";
-            var megamanSprite = new Image();
-            megamanSprite.src = megaman;
-
-            ctx.beginPath();
-            ctx.drawImage(megamanSprite, spriteX, 119, 25, 25, rectangle.x, rectangle.y, 50, 50);
-            ctx.fill();
-
-
-            if (spriteX >= 355) {
-                spriteX = 235;
-            }
-
-            else if (spriteTime >= 10) {
-                spriteX += 60;
-                spriteTime = 0;
-            }
-
-            spriteTime += 1;
+      //PLATFORM COLLISION
 
 
 
-            window.requestAnimationFrame(drawLink);
-        }
+      window.requestAnimationFrame(loop);
 
 
-        //EVENT LISTENERS
 
-        document.addEventListener("keydown", controller.keyListener);
-        document.addEventListener("keyup", controller.keyListener);
-        // document.addEventListener("mousemove", mouseMoveHandler, false);
+      // platformsArr.forEach(platform => {
+      //   if (
+      //     rectangle.x > platformX &&
+      //     rectangle.x < platformX + 350
+
+      //   ) if (rectangle.y + 49 >= platformY) {
+      //     rectangle.y_velocity = -2.955;
+      //     rectangle.jumping = false;
+      //   }
+      // })
+
+      if (
+        rectangle.x > platformX &&
+        rectangle.x < platformX + 350
+
+      ) if (rectangle.y + 49 >= platformY) {
+        rectangle.y_velocity = -2.955;
+        rectangle.jumping = false;
+      }
+
+      if (
+        rectangle.x > platformX &&
+        rectangle.x < platformX + 350
+
+      ) if (rectangle.y + 49 >= platformY) {
+        rectangle.y_velocity = 0;
+        rectangle.y = platformY - 38;
+        rectangle.jumping = false;
+      }
+
+      if (
+        rectangle.x > platform2.x &&
+        rectangle.x < platform2.x + 350
+
+      ) if (rectangle.y + 49 >= platform2.y) {
+        rectangle.y_velocity = 0;
+        rectangle.y = platform2.y - 38;
+        rectangle.jumping = false;
+      }
 
 
-        start();
-        drawLink();
-        loop();
+    };
 
-    </script>
 
+
+
+    function drawPlatform() {
+
+      platform1 = new PlatformObj(platformX, platformY);
+      platform2 = new PlatformObj(platformX + 500, platformY - 100);
+
+      var platformsArr = [platform1, platform2];
+
+      platformsArr.forEach(platform => {
+        platform.update();
+      })
+
+      window.requestAnimationFrame(drawPlatform);
+    }
+
+    // LINK SPRITE LOGIC
+
+    let spriteX = 235;
+
+    let spriteTime = 0;
+
+    function drawLink() {
+      var megaman =
+        "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Characters/link.png";
+      var megamanSprite = new Image();
+      megamanSprite.src = megaman;
+
+      ctx.beginPath();
+      ctx.drawImage(
+        megamanSprite,
+        spriteX,
+        119,
+        25,
+        25,
+        rectangle.x,
+        rectangle.y,
+        50,
+        50
+      );
+      ctx.fill();
+
+      if (spriteX >= 355) {
+        spriteX = 235;
+      } else if (spriteTime >= 10) {
+        spriteX += 60;
+        spriteTime = 0;
+      }
+
+      spriteTime += 1;
+
+      window.requestAnimationFrame(drawLink);
+    }
+
+    //EVENT LISTENERS
+
+    document.addEventListener("keydown", controller.keyListener);
+    document.addEventListener("keyup", controller.keyListener);
+    // document.addEventListener("mousemove", mouseMoveHandler, false);
+
+    start();
+    drawLink();
+    drawPlatform();
+    loop();
+  </script>
 </body>
 
 </html>
-
 
 <!-- if the sprites bottom (top left corner - height), is a the same X as the platform,
 and the sprites bottom is also between the platforms top left and top right points -->
