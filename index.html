@@ -13,7 +13,8 @@
 
 <body>
   <canvas id="myCanvas" width="1000" height="450" style="border: 1px solid black;">
-    <img src="/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg" id="img" style="width: 100%;
+    <img src="/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg"
+      id="img" style="width: 100%;
                 height: 100%;" />
   </canvas>
 
@@ -68,11 +69,11 @@
 
     function PlatformObj(x, y) {
       var platformPath =
-        "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Platforms and Obstacles/Platform_2.png";
+        "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/Sprite Sheets/Platforms and Obstacles/Platform_2.png";
       var platformSprite = new Image();
       platformSprite.src = platformPath;
 
-      platformX -= 6;
+      platformX -= 3;
 
       this.x = x;
       this.y = y;
@@ -97,9 +98,12 @@
       width: 32,
       x: 100,
       x_velocity: 0,
-      y: 100,
-      y_velocity: 0
+      y: Object.freeze(100),
+      y_velocity: 0,
     };
+
+    var firing = false;
+
 
     controller = {
       up: false,
@@ -108,6 +112,9 @@
       right: false,
       fire: false,
       keyListener: function (event) {
+
+
+
         var key_state = event.type == "keydown" ? true : false;
 
         switch (event.keyCode) {
@@ -115,10 +122,13 @@
             controller.up = key_state;
             break;
           case 32:
-            controller.up = key_state;
-            break;
-          case 13:
             controller.fire = key_state;
+            console.log('fire');
+            firing = true;
+            let bY = rectangle.y;
+            // if (boomerangMotion == true) {
+            //   firing = false;
+            // }
             break;
         }
       }
@@ -131,22 +141,89 @@
       height: 50
     };
 
-    function handleMegaman() { }
+    //BOOMERANG LOGIC
 
-    var platformX = 1000; //x
-    // var platformY = Math.floor(Math.random() * 350) + 125; //y
-    var platformY = 275;
+
+
+    var boomX = 52;
+    var boomerangImg = new Image;
+    boomerangImg.src = "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/link-2.gif";
+
+    let boomSpriteX = 327.5
+    let boomSpriteY = 253
+
+
+    let boomCounter = 0;
+
+
+
+    let boomerangObject = {
+      x: 0,
+      y: 0
+    }
+
+
+    function handleBoomerang() {
+
+      let boomY = rectangle.y;
+
+      if (firing == true) {
+
+        // debugger
+
+        ctx.beginPath();
+        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 25, 25);
+        ctx.fill();
+
+
+        boomX += 10
+
+
+        if (boomCounter > 3) {
+          boomCounter = 0;
+          boomSpriteX += 25;
+          if (boomSpriteX > 375) {
+            boomSpriteX = 327.5
+
+          }
+        } else {
+          boomCounter += 1;
+        }
+      }
+
+      else {
+        boomX = 52;
+        firing = false;
+        controller.fire = false;
+      }
+
+      window.requestAnimationFrame(handleBoomerang);
+
+      if (boomX > 875) {
+        firing = false;
+      }
+
+    }
+
+
+
+
+
 
     loop = function () {
       if (controller.up && rectangle.jumping == false) {
         rectangle.y_velocity -= 40;
         rectangle.jumping = true;
         rectangle.jumps += 1;
+
+        // bY += 40;
+
       }
 
       rectangle.y_velocity += 2.9; //gravity
       rectangle.y += rectangle.y_velocity;
       rectangle.y_velocity *= 0.9; //friction
+      // bY -= rectangle.y_velocity;
       //FLOOR COLLISION
       if (rectangle.y > 300) {
         rectangle.jumping = false;
@@ -156,60 +233,32 @@
 
       //PLATFORM COLLISION
 
-
-
       window.requestAnimationFrame(loop);
 
-
-
-      // platformsArr.forEach(platform => {
-      //   if (
-      //     rectangle.x > platformX &&
-      //     rectangle.x < platformX + 350
-
-      //   ) if (rectangle.y + 49 >= platformY) {
-      //     rectangle.y_velocity = -2.955;
-      //     rectangle.jumping = false;
-      //   }
-      // })
-
-      if (
-        rectangle.x > platformX &&
-        rectangle.x < platformX + 350
-
-      ) if (rectangle.y + 49 >= platformY) {
-        rectangle.y_velocity = -2.955;
-        rectangle.jumping = false;
+      if (rectangle.x > platformX && rectangle.x < platformX + 350) {
+        if (rectangle.y + 49 >= platformY) {
+          rectangle.y_velocity = 0;
+          rectangle.y = platformY - 38;
+          rectangle.jumping = false;
+        }
       }
 
-      if (
-        rectangle.x > platformX &&
-        rectangle.x < platformX + 350
-
-      ) if (rectangle.y + 49 >= platformY) {
-        rectangle.y_velocity = 0;
-        rectangle.y = platformY - 38;
-        rectangle.jumping = false;
+      if (rectangle.x > platform2.x && rectangle.x < platform2.x + 350) {
+        if (rectangle.y + 49 >= platform2.y) {
+          rectangle.y_velocity = 0;
+          rectangle.y = platform2.y - 38;
+          rectangle.jumping = false;
+        }
       }
-
-      if (
-        rectangle.x > platform2.x &&
-        rectangle.x < platform2.x + 350
-
-      ) if (rectangle.y + 49 >= platform2.y) {
-        rectangle.y_velocity = 0;
-        rectangle.y = platform2.y - 38;
-        rectangle.jumping = false;
-      }
-
-
     };
 
 
+    var platformX = 1000; //x
+    // var platformY = Math.floor(Math.random() * 350) + 125; //y
+    var platformY = 275;
 
 
-    function drawPlatform() {
-
+    function drawPlatform(x, y) {
       platform1 = new PlatformObj(platformX, platformY);
       platform2 = new PlatformObj(platformX + 500, platformY - 100);
 
@@ -222,7 +271,18 @@
       window.requestAnimationFrame(drawPlatform);
     }
 
+    // function drawBoomerang(x, y) {
+    //   boomerangNew = new BoomerangObj(rectangle.x, rectangle.y);
+
+    //   boomerangNew.update();
+
+    //   window.requestAnimationFrame(drawBoomerang);
+
+    // }
+
     // LINK SPRITE LOGIC
+
+
 
     let spriteX = 235;
 
@@ -230,7 +290,7 @@
 
     function drawLink() {
       var megaman =
-        "/Users/Ronald_Crecco/Desktop/Fun Run JS Project/graphics/Sprite Sheets/Characters/link.png";
+        "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/link.png";
       var megamanSprite = new Image();
       megamanSprite.src = megaman;
 
@@ -267,9 +327,12 @@
     // document.addEventListener("mousemove", mouseMoveHandler, false);
 
     start();
-    drawLink();
     drawPlatform();
+    handleBoomerang();
+    drawLink();
     loop();
+
+
   </script>
 </body>
 
