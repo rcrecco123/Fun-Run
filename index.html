@@ -73,7 +73,7 @@
       var platformSprite = new Image();
       platformSprite.src = platformPath;
 
-      platformX -= 3;
+      platformX -= 8;
 
       this.x = x;
       this.y = y;
@@ -102,8 +102,9 @@
       y_velocity: 0,
     };
 
-    var firing = false;
+    //CONTROLLER OBJECT/FUNCTION
 
+    var firing = false;
 
     controller = {
       up: false,
@@ -126,23 +127,12 @@
             console.log('fire');
             firing = true;
             let bY = rectangle.y;
-            // if (boomerangMotion == true) {
-            //   firing = false;
-            // }
             break;
         }
       }
     };
 
-    var megamanSprite = {
-      x: 0,
-      y: 0,
-      width: 50,
-      height: 50
-    };
-
     //BOOMERANG LOGIC
-
 
 
     var boomX = 52;
@@ -152,27 +142,21 @@
     let boomSpriteX = 327.5
     let boomSpriteY = 253
 
-
     let boomCounter = 0;
-
-
 
     let boomerangObject = {
       x: 0,
       y: 0
     }
 
-
     function handleBoomerang() {
-
-      let boomY = rectangle.y;
 
       if (firing == true) {
 
-        // debugger
+        let boomY = rectangle.y;
 
         ctx.beginPath();
-        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 25, 25);
+        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
         ctx.fill();
 
 
@@ -205,25 +189,19 @@
 
     }
 
-
-
-
-
+    //LOOP FUNCTION (COLLISION)
 
     loop = function () {
       if (controller.up && rectangle.jumping == false) {
         rectangle.y_velocity -= 40;
         rectangle.jumping = true;
         rectangle.jumps += 1;
-
-        // bY += 40;
-
       }
 
       rectangle.y_velocity += 2.9; //gravity
       rectangle.y += rectangle.y_velocity;
       rectangle.y_velocity *= 0.9; //friction
-      // bY -= rectangle.y_velocity;
+
       //FLOOR COLLISION
       if (rectangle.y > 300) {
         rectangle.jumping = false;
@@ -235,21 +213,25 @@
 
       window.requestAnimationFrame(loop);
 
-      if (rectangle.x > platformX && rectangle.x < platformX + 350) {
-        if (rectangle.y + 49 >= platformY) {
-          rectangle.y_velocity = 0;
-          rectangle.y = platformY - 38;
+      if (rectangle.x >= platformX && rectangle.x < platformX + 350) {
+        if (rectangle.y + 47 >= platformY) {
+          rectangle.y_velocity = -3;
+          // rectangle.y = platformY - 38;
           rectangle.jumping = false;
         }
       }
 
       if (rectangle.x > platform2.x && rectangle.x < platform2.x + 350) {
-        if (rectangle.y + 49 >= platform2.y) {
-          rectangle.y_velocity = 0;
-          rectangle.y = platform2.y - 38;
+        if (rectangle.y + 47 >= platform2.y) {
+          rectangle.y_velocity = -3;
+          // rectangle.y = platform2.y - 38;
           rectangle.jumping = false;
         }
       }
+
+
+
+
     };
 
 
@@ -258,9 +240,12 @@
     var platformY = 275;
 
 
+    //so i guess i can have two or three platform objects 
+
     function drawPlatform(x, y) {
       platform1 = new PlatformObj(platformX, platformY);
       platform2 = new PlatformObj(platformX + 500, platformY - 100);
+
 
       var platformsArr = [platform1, platform2];
 
@@ -271,18 +256,8 @@
       window.requestAnimationFrame(drawPlatform);
     }
 
-    // function drawBoomerang(x, y) {
-    //   boomerangNew = new BoomerangObj(rectangle.x, rectangle.y);
-
-    //   boomerangNew.update();
-
-    //   window.requestAnimationFrame(drawBoomerang);
-
-    // }
 
     // LINK SPRITE LOGIC
-
-
 
     let spriteX = 235;
 
@@ -320,17 +295,91 @@
       window.requestAnimationFrame(drawLink);
     }
 
+
+    //ENEMIES HANDLER
+
+
+
+
+    let randomEnemyY = 1100;
+    let enemy = new Image();
+    enemy.src = "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/castlevania2_enemies_sheet.png";
+    let enemyX = 0;
+    let enemyY = 0;
+
+
+
+
+
+    function randomNum(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    let enemyFloatUp = false;
+
+    let floatCounter = 0;
+
+    function handleEnemy() {
+
+      ctx.beginPath();
+      ctx.drawImage(enemy, 160, 7, 25, 25, 1075 + enemyX, randomEnemyY + enemyY, 50, 40);
+      ctx.fill();
+
+      enemyX -= 16;
+
+      if (enemyFloatUp) {
+        enemyY += 1;
+        floatCounter += 1;
+      }
+
+      else if (enemyFloatUp == false) {
+        enemyY -= 1;
+        floatCounter += 1;
+      }
+
+      if (floatCounter >= 20) {
+        enemyFloatUp = !enemyFloatUp;
+        floatCounter = 0;
+      }
+
+
+      if (enemyX < -1400) {
+        enemyX = 0;
+        enemyY = 0;
+        randomEnemyY = randomNum(150, 300);
+        floatCounter = 0;
+      }
+
+
+
+      window.requestAnimationFrame(handleEnemy);
+
+    }
+
+
+
+
+
+
+
     //EVENT LISTENERS
 
     document.addEventListener("keydown", controller.keyListener);
     document.addEventListener("keyup", controller.keyListener);
     // document.addEventListener("mousemove", mouseMoveHandler, false);
 
+
     start();
     drawPlatform();
     handleBoomerang();
     drawLink();
+    handleEnemy();
     loop();
+
+
+
+
+    //look into using a master "draw" function
 
 
   </script>
