@@ -8,7 +8,7 @@
 
   <script></script>
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script> -->
-  <title>Document</title>
+  <title>Fun Run</title>
 </head>
 
 <body>
@@ -22,10 +22,15 @@
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
 
+
+    window.onload = function () {
+      document.getElementById("my_audio").play();
+    }
+
     // SCROLLING BACKGROUND CODE
 
     var img = document.getElementsByTagName("img")[0];
-    var velocity = 425; //100pixels/second
+    var velocity = 900; //100pixels/second
     var distance = 0;
     var lastFrameRepaintTime = 0;
 
@@ -74,11 +79,20 @@
       platformSprite.src = platformPath;
 
       platformX -= 8;
+      platformXtwo -= 8;
+
+      if (platformX < -950) {
+        platformX = 1000;
+        platformXtwo = 1550;
+        platformY = randomNum(250, 300);
+        platformYtwo = randomNum(165, 200);
+      }
 
       this.x = x;
       this.y = y;
 
       this.update = () => {
+        //I PROLLY DUN NEED THIS!
         this.draw();
       };
       this.draw = () => {
@@ -86,8 +100,35 @@
         ctx.drawImage(platformSprite, x, y, 400, 55);
         ctx.fill();
         ctx.closePath();
+
       };
+      this.reset = () => {
+        //create a reset function! ;)
+      }
     }
+
+    let platformXtwo = 1575;
+    let platformYtwo = 250;
+
+    var platformX = 1000; //x
+    var platformY = 275;
+
+    //so i guess i can have two or three platform objects
+
+    function drawPlatform(x, y) {
+      platform1 = new PlatformObj(platformX, platformY);
+      platform2 = new PlatformObj(platformXtwo, platformYtwo);
+
+
+      var platformsArr = [platform1, platform2];
+
+      platformsArr.forEach(platform => {
+        platform.update();
+      })
+
+      window.requestAnimationFrame(drawPlatform);
+    }
+
 
     //JUMPING RECTANGLE CODE
 
@@ -152,12 +193,15 @@
     function handleBoomerang() {
 
       if (firing == true) {
-
         let boomY = rectangle.y;
+        // boomY = this.boomY;
+        let y;
+        this.y = boomY;
 
         ctx.beginPath();
-        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
+        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, this.y, 30, 30);
         ctx.fill();
+
 
 
         boomX += 10
@@ -214,7 +258,7 @@
       window.requestAnimationFrame(loop);
 
       if (rectangle.x >= platformX && rectangle.x < platformX + 350) {
-        if (rectangle.y + 47 >= platformY) {
+        if (rectangle.y + 47 >= platformY && rectangle.y <= platformY - 5) {
           rectangle.y_velocity = -3;
           // rectangle.y = platformY - 38;
           rectangle.jumping = false;
@@ -222,7 +266,7 @@
       }
 
       if (rectangle.x > platform2.x && rectangle.x < platform2.x + 350) {
-        if (rectangle.y + 47 >= platform2.y) {
+        if (rectangle.y + 47 >= platform2.y && rectangle.y <= platform2.y - 5) {
           rectangle.y_velocity = -3;
           // rectangle.y = platform2.y - 38;
           rectangle.jumping = false;
@@ -235,26 +279,6 @@
     };
 
 
-    var platformX = 1000; //x
-    // var platformY = Math.floor(Math.random() * 350) + 125; //y
-    var platformY = 275;
-
-
-    //so i guess i can have two or three platform objects 
-
-    function drawPlatform(x, y) {
-      platform1 = new PlatformObj(platformX, platformY);
-      platform2 = new PlatformObj(platformX + 500, platformY - 100);
-
-
-      var platformsArr = [platform1, platform2];
-
-      platformsArr.forEach(platform => {
-        platform.update();
-      })
-
-      window.requestAnimationFrame(drawPlatform);
-    }
 
 
     // LINK SPRITE LOGIC
@@ -322,7 +346,7 @@
     function handleEnemy() {
 
       ctx.beginPath();
-      ctx.drawImage(enemy, 160, 7, 25, 25, 1075 + enemyX, randomEnemyY + enemyY, 50, 40);
+      ctx.drawImage(enemy, 160, 7, 25, 25, 1075 + enemyX, randomEnemyY + enemyY, 70, 50);
       ctx.fill();
 
       enemyX -= 16;
@@ -358,6 +382,54 @@
 
 
 
+    let triforce = new Image();
+    triforce.src = "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/Sprite Sheets/Items/oot_triforce_alpha.png"
+
+    //TRIFORCE PIECES HANDLER
+
+    let triforceX = 138.5
+    let triforceCounter = 0;
+    let triforcePosX = 1500;
+
+    function triforcePiece() {
+      ctx.beginPath();
+      ctx.drawImage(triforce, triforceX, 24.5, 15, 15, triforcePosX, 50, 30, 30);
+      ctx.fill();
+
+      triforcePosX -= 16;
+
+      if (triforceCounter > 4) {
+        triforceX += 17;
+        triforceCounter = 0;
+      }
+      triforceCounter += 1;
+
+      if (triforceX > 250) {
+        triforceX = 138.5;
+      }
+
+      if (triforcePosX < -1000) {
+        triforcePosX = 1700;
+      }
+
+      window.requestAnimationFrame(triforcePiece);
+    }
+
+
+
+    let scoreCounter = 0;
+
+    function scoreText() {
+      ctx.font = "20px Lucida Console"
+      ctx.fillStyle = "gray";
+      ctx.fillText(`Score: ${scoreCounter}`, 890, 425);
+
+      scoreCounter += 1;
+
+      window.requestAnimationFrame(scoreText);
+
+    }
+
 
 
 
@@ -374,11 +446,13 @@
     handleBoomerang();
     drawLink();
     handleEnemy();
+    triforcePiece();
+    scoreText();
     loop();
 
 
 
-
+    //Score
     //look into using a master "draw" function
 
 
