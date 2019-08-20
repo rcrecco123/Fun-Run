@@ -23,9 +23,6 @@
     var ctx = canvas.getContext("2d");
 
 
-    window.onload = function () {
-      document.getElementById("my_audio").play();
-    }
 
     // SCROLLING BACKGROUND CODE
 
@@ -155,8 +152,6 @@
       fire: false,
       keyListener: function (event) {
 
-
-
         var key_state = event.type == "keydown" ? true : false;
 
         switch (event.keyCode) {
@@ -175,6 +170,10 @@
 
     //BOOMERANG LOGIC
 
+
+    boomerangObj = {
+
+    }
 
     var boomX = 52;
     var boomerangImg = new Image;
@@ -202,17 +201,13 @@
         ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, this.y, 30, 30);
         ctx.fill();
 
-
-
         boomX += 10
-
 
         if (boomCounter > 3) {
           boomCounter = 0;
           boomSpriteX += 25;
           if (boomSpriteX > 375) {
             boomSpriteX = 327.5
-
           }
         } else {
           boomCounter += 1;
@@ -273,8 +268,26 @@
         }
       }
 
+      //TRIFORCE COLLISION
 
 
+
+      //ENEMY COLLISION
+
+      // if (rectangle.x >= enemyX && rectangle.x <= enemyX + 50) {
+      //   if (rectangle.y + 10 >= enemyY && rectangle.y <= enemyY) {
+      //     console.log('enemy hit!');
+      //     gameOver = true;
+      //   }
+      // }
+
+      ctx.drawImage(enemy, 160, 7, 25, 25, 1075 + enemyX, randomEnemyY + enemyY, 70, 50);
+
+      if (rectangle.x > 1075 + enemyX && rectangle.x < 1075 + enemyX + 30) {
+        if (rectangle.y + 47 >= randomEnemyY + enemyY && rectangle.y <= randomEnemyY + enemyY - 5) {
+          console.log("enemy HIT!!!!");
+        }
+      }
 
     };
 
@@ -331,10 +344,6 @@
     let enemyX = 0;
     let enemyY = 0;
 
-
-
-
-
     function randomNum(min, max) {
       return Math.random() * (max - min) + min;
     }
@@ -374,13 +383,9 @@
         floatCounter = 0;
       }
 
-
-
       window.requestAnimationFrame(handleEnemy);
 
     }
-
-
 
     let triforce = new Image();
     triforce.src = "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/Sprite Sheets/Items/oot_triforce_alpha.png"
@@ -390,11 +395,29 @@
     let triforceX = 138.5
     let triforceCounter = 0;
     let triforcePosX = 1500;
+    let triforceY = 300
+    var collectCount = 0;
+
+    let triforceCollectArray = [];
 
     function triforcePiece() {
+
       ctx.beginPath();
-      ctx.drawImage(triforce, triforceX, 24.5, 15, 15, triforcePosX, 50, 30, 30);
+      ctx.drawImage(triforce, triforceX, 24.5, 15, 15, triforcePosX, triforceY, 30, 30);
       ctx.fill();
+
+      if (rectangle.x >= triforcePosX - 10 && rectangle.x <= triforcePosX + 50) {
+        if (rectangle.y >= triforceY && rectangle.y <= triforceY + 50) {
+          console.log("collected!!!!");
+          collectCount += 1;
+
+          triforcePosX = 1700;
+          let triforceY = 300;
+
+        }
+      }
+
+
 
       triforcePosX -= 16;
 
@@ -415,14 +438,36 @@
       window.requestAnimationFrame(triforcePiece);
     }
 
+    let spikes = new Image();
+    spikes.src = "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/Sprite Sheets/Items/Long_Spike_Row.png";
+
+    let spikeX = 1500;
+    let spikeY = 325;
+
+    function drawSpikes() {
+
+      ctx.beginPath();
+      ctx.drawImage(spikes, 0, 0, 609, 127, spikeX, spikeY, 200, 25);
+      ctx.fill();
+
+      spikeX -= 16;
+
+      if (spikeX < -725) {
+        spikeX = 1500;
+      }
+
+      window.requestAnimationFrame(drawSpikes)
+    }
 
 
     let scoreCounter = 0;
 
     function scoreText() {
+
       ctx.font = "20px Lucida Console"
       ctx.fillStyle = "gray";
       ctx.fillText(`Score: ${scoreCounter}`, 890, 425);
+      ctx.fillText(`Shards Collected: ${collectCount}`, 25, 425);
 
       scoreCounter += 1;
 
@@ -432,6 +477,45 @@
 
 
 
+    let lifeCount = 100;
+
+    function lifeCounter() {
+
+
+      ctx.beginPath();
+      ctx.fillText(`Life Counter: ${Math.floor(lifeCount)}%`, 400, 425)
+      ctx.fill();
+
+      // if (rectangle.x >= platformX && rectangle.x < platformX + 350) {
+      //   if (rectangle.y + 47 >= platformY && rectangle.y <= platformY - 5) {
+      //     rectangle.y_velocity = -3;
+      //     // rectangle.y = platformY - 38;
+      //     rectangle.jumping = false;
+      //   }
+      // }
+
+      if (rectangle.x > spikeX && rectangle.x < spikeX + 350) {
+        if (rectangle.y + 47 >= spikeY && rectangle.y <= spikeY - 5) {
+          // lifeCount -= 0.35;
+          lifeCount -= 10;
+        }
+      }
+
+      if (rectangle.x >= enemyX && rectangle.x <= enemyX + 45) {
+        if (rectangle.y >= enemyY - 15 && rectangle.y <= enemyY + 15) {
+          lifeCount -= 10;
+        }
+      }
+
+      if (lifeCount < 0) {
+        gameOverFunction();
+      }
+
+      window.requestAnimationFrame(lifeCounter);
+
+    }
+
+    // TRIFORCE SOUND EFFECT
 
 
     //EVENT LISTENERS
@@ -441,20 +525,40 @@
     // document.addEventListener("mousemove", mouseMoveHandler, false);
 
 
-    start();
-    drawPlatform();
-    handleBoomerang();
-    drawLink();
-    handleEnemy();
-    triforcePiece();
-    scoreText();
-    loop();
 
+
+    function gameOverFunction() {
+      console.log("HEY GAME OVER!")
+      window.requestAnimationFrame(gameOverFunction);
+    }
+
+
+
+    function game() {
+
+      if (lifeCount > 0) {
+        start();
+        drawPlatform();
+        handleBoomerang();
+        drawLink();
+        handleEnemy();
+        drawSpikes();
+        triforcePiece();
+        lifeCounter();
+        scoreText();
+        loop();
+      } else {
+        gameOverFunction();
+      }
+
+    }
+
+
+    game();
 
 
     //Score
     //look into using a master "draw" function
-
 
   </script>
 </body>
