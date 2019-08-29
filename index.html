@@ -18,9 +18,100 @@
                 height: 100%;" />
   </canvas>
 
+  <canvas id="introCanvas" width="1000" height="450" style="border: 1px solid black;">
+    <img src="/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg"
+      id="img" style="width: 100%;
+                height: 100%;" />
+  </canvas>
+
   <script>
+
+    var introCanvas = document.getElementById("introCanvas");
+    var introCtx = introCanvas.getContext("2d");
+    var canvas = document.getElementById("canvas")
+
+
+    var introBackground = new Image;
+    introBackground.src = "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg";
+
+    // Make sure the image is loaded first otherwise nothing will draw.
+    introBackground.onload = function () {
+      ctx.drawImage(Background, 0, 0);
+    }
+
+    function introScreen() {
+      introCtx.beginPath();
+
+      introCtx.drawImage(introBackground, 0, 0);
+
+      introCtx.fillStyle = "white";
+      introCtx.font = "50px Arial";
+      introCtx.fillText("Fun Run", 410, 225)
+
+      introCtx.font = "40px Arial";
+      introCtx.fillText("Start", 455, 290)
+
+      introCtx.font = "25px Arial";
+      introCtx.fillText("UP ARROW: Jump", 40, 60)
+
+      introCtx.font = "25px Arial";
+      introCtx.fillText("SPACE BAR: Boomerang", 40, 95)
+
+      // introCtx.rect(20, 20, 150, 100);
+      // introCtx.stroke();
+
+
+
+      introCtx.fill();
+
+
+
+      window.requestAnimationFrame(introScreen);
+
+    }
+
+    function introScreenTwo() {
+      ctx.beginPath();
+
+      ctx.drawImage(introBackground, 0, 0);
+
+      ctx.fillStyle = "white";
+      ctx.font = "50px Arial";
+      ctx.fillText("Fun Run", 410, 225)
+
+      ctx.font = "40px Arial";
+      ctx.fillText("Start", 455, 290)
+
+      ctx.font = "25px Arial";
+      ctx.fillText("UP ARROW: Jump", 40, 60)
+
+      ctx.font = "25px Arial";
+      ctx.fillText("SPACE BAR: Boomerang", 40, 95)
+
+      // if the mouse is within the width and height of the text, when mouse is clicked, clears the intro screen.
+
+
+
+
+      // introCtx.rect(20, 20, 150, 100);
+      // introCtx.stroke();
+
+
+
+      ctx.fill();
+
+
+
+      window.requestAnimationFrame(introScreenTwo);
+
+    }
+
+
+
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
+
+
 
 
 
@@ -142,6 +233,41 @@
 
     //CONTROLLER OBJECT/FUNCTION
 
+
+
+
+
+    //report the mouse position on click
+    canvas.addEventListener("click", function (evt) {
+      var mousePos = getMousePos(canvas, evt);
+
+      if (mousePos.x > 458 && mousePos.x < 542) {
+        if (mousePos.y > 265 && mousePos.y < 295) {
+          if (controller.click = true) {
+            console.log("START GAME!!!");
+            bigGameLoop();
+          }
+        }
+      }
+
+
+
+    }, false);
+
+    //get mouse position
+    function getMousePos(canvas, evt) {
+      var rect = canvas.getBoundingClientRect();
+      return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+      };
+    }
+
+
+    mouse = {
+      x: 0
+    }
+
     var firing = false;
 
     controller = {
@@ -150,6 +276,7 @@
       down: false,
       right: false,
       fire: false,
+      click: false,
       keyListener: function (event) {
 
         var key_state = event.type == "keydown" ? true : false;
@@ -194,11 +321,16 @@
       if (firing == true) {
         let boomY = rectangle.y;
         // boomY = this.boomY;
-        let y;
-        this.y = boomY;
+        // let y;
+        // this.y = boomY;
+
+
+        // boomY -= getDistance(0, rectangle.y, 0, boomY);
+        boomY -= -(boomY - rectangle.y);
+
 
         ctx.beginPath();
-        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, this.y, 30, 30);
+        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
         ctx.fill();
 
         boomX += 10
@@ -286,6 +418,10 @@
       if (rectangle.x > 1075 + enemyX && rectangle.x < 1075 + enemyX + 30) {
         if (rectangle.y + 47 >= randomEnemyY + enemyY && rectangle.y <= randomEnemyY + enemyY - 5) {
           console.log("enemy HIT!!!!");
+          enemyX = 0;
+          enemyY = 0;
+          lifeCount -= 4.5;
+
         }
       }
 
@@ -383,6 +519,17 @@
         floatCounter = 0;
       }
 
+      if (rectangle.x >= enemyX && rectangle.x <= enemyX + 70) {
+        if (rectangle.y >= enemyY && rectangle.y <= enemyY + 50) {
+          console.log("ENEMY GONE");
+
+
+          enemyX = 0;
+          enemyY = 0;
+
+        }
+      }
+
       window.requestAnimationFrame(handleEnemy);
 
     }
@@ -395,7 +542,7 @@
     let triforceX = 138.5
     let triforceCounter = 0;
     let triforcePosX = 1500;
-    let triforceY = 300
+    let triforceY = 100;
     var collectCount = 0;
 
     let triforceCollectArray = [];
@@ -478,26 +625,17 @@
 
 
     let lifeCount = 100;
-
+    let endGameCounter = 0;
     function lifeCounter() {
-
 
       ctx.beginPath();
       ctx.fillText(`Life Counter: ${Math.floor(lifeCount)}%`, 400, 425)
       ctx.fill();
 
-      // if (rectangle.x >= platformX && rectangle.x < platformX + 350) {
-      //   if (rectangle.y + 47 >= platformY && rectangle.y <= platformY - 5) {
-      //     rectangle.y_velocity = -3;
-      //     // rectangle.y = platformY - 38;
-      //     rectangle.jumping = false;
-      //   }
-      // }
-
       if (rectangle.x > spikeX && rectangle.x < spikeX + 350) {
         if (rectangle.y + 47 >= spikeY && rectangle.y <= spikeY - 5) {
           // lifeCount -= 0.35;
-          lifeCount -= 10;
+          lifeCount -= 25;
         }
       }
 
@@ -508,15 +646,35 @@
       }
 
       if (lifeCount < 0) {
-        gameOverFunction();
+        endGameLoop();
       }
+
+
 
       window.requestAnimationFrame(lifeCounter);
 
     }
 
-    // TRIFORCE SOUND EFFECT
+    function endGameLoop() {
+      console.log("GAME OVER pHr33K!!!!")
+      ctx.beginPath();
 
+      ctx.drawImage(introBackground, 0, 0);
+
+      ctx.fillStyle = "white";
+      ctx.font = "50px Arial";
+      ctx.fillText("GAME OVER", 410, 225)
+
+      ctx.fill();
+
+      lifeCount = 100;
+      scoreCounter = "LOZER!"
+
+      window.requestAnimationFrame(endGameLoop);
+
+    }
+
+    // TRIFORCE SOUND EFFECT
 
     //EVENT LISTENERS
 
@@ -527,34 +685,35 @@
 
 
 
-    function gameOverFunction() {
-      console.log("HEY GAME OVER!")
-      window.requestAnimationFrame(gameOverFunction);
-    }
-
-
-
-    function game() {
-
-      if (lifeCount > 0) {
+    function bigGameLoop() {
+      this.lifeCount = lifeCount;
+      if (this.lifeCount > 0) {
+        debugger
         start();
         drawPlatform();
         handleBoomerang();
         drawLink();
-        handleEnemy();
+
         drawSpikes();
         triforcePiece();
         lifeCounter();
         scoreText();
         loop();
-      } else {
-        gameOverFunction();
+        handleEnemy();
       }
-
     }
 
 
-    game();
+
+    introScreenTwo();
+
+
+    // game();
+
+
+
+
+
 
 
     //Score
