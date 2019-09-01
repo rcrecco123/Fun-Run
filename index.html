@@ -297,11 +297,6 @@
 
     //BOOMERANG LOGIC
 
-
-    boomerangObj = {
-
-    }
-
     var boomX = 52;
     var boomerangImg = new Image;
     boomerangImg.src = "/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/link-2.gif";
@@ -311,21 +306,13 @@
 
     let boomCounter = 0;
 
-    let boomerangObject = {
-      x: 0,
-      y: 0
-    }
-
     function handleBoomerang() {
+
+      debugger;
 
       if (firing == true) {
         let boomY = rectangle.y;
-        // boomY = this.boomY;
-        // let y;
-        // this.y = boomY;
 
-
-        // boomY -= getDistance(0, rectangle.y, 0, boomY);
         boomY -= -(boomY - rectangle.y);
 
 
@@ -686,22 +673,24 @@
 
 
     function bigGameLoop() {
-      this.lifeCount = lifeCount;
-      if (this.lifeCount > 0) {
-        debugger
-        start();
-        drawPlatform();
-        handleBoomerang();
-        drawLink();
 
-        drawSpikes();
-        triforcePiece();
-        lifeCounter();
-        scoreText();
-        loop();
-        handleEnemy();
+
+      start();
+      drawPlatform();
+
+      if (firing == true) {
+        handleBoomerang();
       }
+      drawLink();
+
+      drawSpikes();
+      triforcePiece();
+      lifeCounter();
+      scoreText();
+      loop();
+      handleEnemy();
     }
+
 
 
 
