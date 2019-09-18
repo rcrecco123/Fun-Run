@@ -12,10 +12,24 @@
 </head>
 
 <body>
+
+  <canvas id="leftCanvas" width="135" height="450" style="border: 1px solid black;">
+
+  </canvas>
+
   <canvas id="myCanvas" width="1000" height="450" style="border: 1px solid black;">
-    <img src="/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg"
-      id="img" style="width: 100%;
+    <img src="graphics/16-bit-background_5878-3.jpg" id="img" style="width: 100%;
                 height: 100%;" />
+  </canvas>
+
+  <canvas id="rightCanvas" width="135" height="450" style="border: 1px solid black;">
+
+  </canvas>
+
+  <br>
+
+  <canvas id="bottomCanvas" width="1282" height="200" style="border: 1px solid black;">
+
   </canvas>
 
   <!-- <canvas id="introCanvas" width="1000" height="450" style="border: 1px solid black;">
@@ -25,6 +39,127 @@
   </canvas> -->
 
   <script>
+
+    // var canvas = document.getElementById("myCanvas");
+    // var ctx = canvas.getContext("2d");
+
+
+    var leftCanvasBar = document.getElementById("leftCanvas")
+    var leftCtx = leftCanvasBar.getContext('2d');
+
+    var rightCanvasBar = document.getElementById("rightCanvas")
+    var rightCtx = rightCanvasBar.getContext('2d');
+
+    var bottomCanvasBar = document.getElementById("bottomCanvas")
+    var bottomCtx = bottomCanvasBar.getContext('2d');
+
+
+    // introCtx.font = "25px Arial";
+    // introCtx.fillText("UP ARROW: Jump", 40, 60)
+
+    // introCtx.font = "25px Arial";
+    // introCtx.fillText("SPACE BAR: Boomerang", 40, 95)
+
+
+    function sideBars() {
+
+
+
+      leftCtx.beginPath();
+
+      leftCtx.fillStyle = "purple";
+      leftCtx.fillRect(0, 0, leftCanvasBar.width, leftCanvasBar.height);
+
+      leftCtx.font = "14px Arial";
+      leftCtx.fillStyle = "black";
+      leftCtx.fillText('CONTROLS', 15, 25);
+
+      leftCtx.fillText("SPACE BAR:", 10, 60)
+      leftCtx.fillText("Boomerang", 10, 82)
+
+      leftCtx.fillText("UP ARROW:", 10, 110)
+      leftCtx.fillText("Jump", 10, 130)
+
+      leftCtx.fill();
+
+
+      rightCtx.beginPath();
+
+      rightCtx.fillStyle = "purple";
+      rightCtx.fillRect(0, 0, rightCanvasBar.width, rightCanvasBar.height);
+
+      rightCtx.font = "14px Arial";
+      rightCtx.fillStyle = "black";
+      rightCtx.font = "14px Arial";
+
+      rightCtx.fillText("OBJECTIVES", 15, 25);
+
+      rightCtx.fillText("-Collect shards", 2, 60);
+
+      rightCtx.fillText("-Avoid enemies", 2, 85);
+
+      rightCtx.fillText("-Avoid obstacles", 2, 110);
+
+      rightCtx.fillText("-Shoot boomerang", 2, 135);
+
+      rightCtx.fillText("-Keep running!", 2, 160);
+
+      rightCtx.fill();
+
+
+
+      bottomCanvasBar.addEventListener("click", function (evt) {
+        var mousePos = getMousePos(bottomCanvasBar, evt);
+
+        if (mousePos.x > 16 && mousePos.x < 123) {
+          if (mousePos.y > 146 && mousePos.y < 188) {
+            document.body.style.cursor = "pointer";
+            if (controller.click = true) {
+              window.location = "https://www.linkedin.com/in/ronald-crecco-2a4065136/";
+            }
+          }
+        }
+
+        if (mousePos.x > 155 && mousePos.x < 282) {
+          if (mousePos.y > 146 && mousePos.y < 188) {
+            document.body.style.cursor = "pointer";
+            if (controller.click = true) {
+              window.location = "https://rcrecco123.github.io/";
+            }
+          }
+        }
+
+
+      }, false);
+
+
+
+      bottomCtx.beginPath();
+      bottomCtx.fillStyle = "purple";
+      bottomCtx.fillRect(0, 0, bottomCanvasBar.width, bottomCanvasBar.height);
+      bottomCtx.font = " 16px Arial";
+      bottomCtx.fillStyle = "black";
+      bottomCtx.fillText("a game by Ronald Crecco", 1075, 180);
+
+      var linkedinButton = new Image;
+      linkedinButton.src = "graphics/button_linkedin.png"
+      bottomCtx.drawImage(linkedinButton, 15, 145)
+
+      var websiteButton = new Image;
+      websiteButton.src = "graphics/button_website.png"
+      bottomCtx.drawImage(websiteButton, 155, 145)
+
+      var crest = new Image;
+      crest.src = "graphics/hyruleresize1.png";
+      bottomCtx.drawImage(crest, 500, 10)
+
+      window.requestAnimationFrame(sideBars);
+
+    }
+
+
+
+
 
     // var introCanvas = document.getElementById("introCanvas");
     // var introCtx = introCanvas.getContext("2d");
@@ -36,10 +171,11 @@
 
     // Make sure the image is loaded first otherwise nothing will draw.
     introBackground.onload = function () {
-      ctx.drawImage(Background, 0, 0);
+      ctx.drawImage(introBackground, 0, 0);
     }
 
     function introScreen() {
+
       introCtx.beginPath();
 
       introCtx.drawImage(introBackground, 0, 0);
@@ -60,11 +196,7 @@
       // introCtx.rect(20, 20, 150, 100);
       // introCtx.stroke();
 
-
-
       introCtx.fill();
-
-
 
       window.requestAnimationFrame(introScreen);
 
@@ -90,30 +222,14 @@
 
       // if the mouse is within the width and height of the text, when mouse is clicked, clears the intro screen.
 
-
-
-
-      // introCtx.rect(20, 20, 150, 100);
-      // introCtx.stroke();
-
-
-
       ctx.fill();
-
-
 
       window.requestAnimationFrame(introScreenTwo);
 
     }
 
-
-
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
-
-
-
-
 
     // SCROLLING BACKGROUND CODE
 
@@ -217,7 +333,6 @@
       window.requestAnimationFrame(drawPlatform);
     }
 
-
     //JUMPING RECTANGLE CODE
 
     rectangle = {
@@ -232,8 +347,6 @@
     };
 
     //CONTROLLER OBJECT/FUNCTION
-
-
 
     let screenCount = 0;
 
@@ -253,9 +366,6 @@
           }
         }
       }
-
-
-
     }, false);
 
     //get mouse position
@@ -266,7 +376,6 @@
         y: evt.clientY - rect.top
       };
     }
-
 
     mouse = {
       x: 0
@@ -312,13 +421,10 @@
 
     function handleBoomerang() {
 
-
-
       if (firing == true) {
         let boomY = rectangle.y;
 
         boomY -= -(boomY - rectangle.y);
-
 
         ctx.beginPath();
         ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
@@ -348,7 +454,6 @@
       if (boomX > 875) {
         firing = false;
       }
-
     }
 
     //LOOP FUNCTION (COLLISION)
@@ -393,8 +498,6 @@
 
       //TRIFORCE COLLISION
 
-
-
       //ENEMY COLLISION
 
       // if (rectangle.x >= enemyX && rectangle.x <= enemyX + 50) {
@@ -417,9 +520,6 @@
       }
 
     };
-
-
-
 
     // LINK SPRITE LOGIC
 
@@ -459,11 +559,7 @@
       window.requestAnimationFrame(drawLink);
     }
 
-
     //ENEMIES HANDLER
-
-
-
 
     let randomEnemyY = 1100;
     let enemy = new Image();
@@ -502,7 +598,6 @@
         floatCounter = 0;
       }
 
-
       if (enemyX < -1400) {
         enemyX = 0;
         enemyY = 0;
@@ -513,7 +608,6 @@
       if (rectangle.x >= enemyX && rectangle.x <= enemyX + 70) {
         if (rectangle.y >= enemyY && rectangle.y <= enemyY + 50) {
           console.log("ENEMY GONE");
-
 
           enemyX = 0;
           enemyY = 0;
@@ -555,8 +649,6 @@
         }
       }
 
-
-
       triforcePosX -= 16;
 
       if (triforceCounter > 4) {
@@ -597,7 +689,6 @@
       window.requestAnimationFrame(drawSpikes)
     }
 
-
     let scoreCounter = 0;
 
     function scoreText() {
@@ -605,6 +696,7 @@
       ctx.font = "20px Lucida Console"
       ctx.fillStyle = "gray";
       ctx.fillText(`Score: ${scoreCounter}`, 825, 425);
+      ctx.fillText(`Life: ${lifeCount}`, 400, 425);
       ctx.fillText(`Shards Collected: ${collectCount}`, 25, 425);
 
       scoreCounter += 1;
@@ -612,8 +704,6 @@
       window.requestAnimationFrame(scoreText);
 
     }
-
-
 
     let lifeCount = 100;
     let endGameCounter = 0;
@@ -624,13 +714,13 @@
       if (rectangle.x > spikeX && rectangle.x < spikeX + 350) {
         if (rectangle.y + 47 >= spikeY && rectangle.y <= spikeY - 5) {
           // lifeCount -= 0.35;
-          lifeCount -= 8;
+          lifeCount -= 2;
         }
       }
 
       if (rectangle.x >= enemyX && rectangle.x <= enemyX + 45) {
         if (rectangle.y >= enemyY - 15 && rectangle.y <= enemyY + 15) {
-          lifeCount -= 10;
+          lifeCount -= 3;
         }
       }
 
@@ -638,8 +728,6 @@
         startScreen = false;
         endGameLoop();
       }
-
-
 
       window.requestAnimationFrame(lifeCounter);
 
@@ -681,7 +769,6 @@
       }
     }, false);
 
-
     // TRIFORCE SOUND EFFECT
 
     //EVENT LISTENERS
@@ -689,9 +776,6 @@
     document.addEventListener("keydown", controller.keyListener);
     document.addEventListener("keyup", controller.keyListener);
     // document.addEventListener("mousemove", mouseMoveHandler, false);
-
-
-
 
     function bigGameLoop() {
 
@@ -712,7 +796,7 @@
     }
 
     introScreenTwo();
-
+    sideBars();
     // game();
 
     //Score
