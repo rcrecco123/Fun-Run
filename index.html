@@ -32,16 +32,8 @@
 
   </canvas>
 
-  <!-- <canvas id="introCanvas" width="1000" height="450" style="border: 1px solid black;">
-    <img src="/Users/Ronald_Crecco/Desktop/Projects Aug 2019/Fun Run JS Project/graphics/16-bit-background_5878-3.jpg"
-      id="img" style="width: 100%;
-                height: 100%;" />
-  </canvas> -->
-
   <script>
 
-    // var canvas = document.getElementById("myCanvas");
-    // var ctx = canvas.getContext("2d");
     document.body.style.position = "absolute";
 
     var leftCanvasBar = document.getElementById("leftCanvas")
@@ -53,17 +45,7 @@
     var bottomCanvasBar = document.getElementById("bottomCanvas")
     var bottomCtx = bottomCanvasBar.getContext('2d');
 
-
-    // introCtx.font = "25px Arial";
-    // introCtx.fillText("UP ARROW: Jump", 40, 60)
-
-    // introCtx.font = "25px Arial";
-    // introCtx.fillText("SPACE BAR: Boomerang", 40, 95)
-
-
     function sideBars() {
-
-
 
       leftCtx.beginPath();
 
@@ -232,7 +214,7 @@
     // SCROLLING BACKGROUND CODE
 
     var img = document.getElementsByTagName("img")[0];
-    var velocity = 900; //100pixels/second
+    var velocity = 600; //100pixels/second
     var distance = 0;
     var lastFrameRepaintTime = 0;
 
@@ -406,53 +388,67 @@
       }
     };
 
+    //SPIN ATTACK LOGIC
+
+    let spinAttack = new Image;
+    spinAttack.src = "graphics/link_reversed.gif";
+
+    function handleSpinAttack() {
+      ctx.beginPath();
+      ctx.drawImage(spinAttack, 137, 173, 25, 25, 100, 100, 25, 25);
+      ctx.fill();
+      ctx.closePath();
+
+      window.requestAnimationFrame(handleSpinAttack);
+    }
+
     //BOOMERANG LOGIC
 
-    var boomX = 52;
-    var boomerangImg = new Image;
-    boomerangImg.src = "graphics/link-2.gif";
+    // var boomX = 52;
+    // var boomerangImg = new Image;
+    // boomerangImg.src = "graphics/link-2.gif";
 
-    let boomSpriteX = 327.5
-    let boomSpriteY = 253
+    // let boomSpriteX = 327.5
+    // let boomSpriteY = 253
 
-    let boomCounter = 0;
+    // let boomCounter = 0;
 
-    function handleBoomerang() {
+    // function handleBoomerang() {
 
-      if (firing == true) {
-        let boomY = rectangle.y;
+    //   if (firing == true) {
+    //     let boomY = rectangle.y;
 
-        boomY -= -(boomY - rectangle.y);
+    //     boomY -= -(boomY - rectangle.y);
 
-        ctx.beginPath();
-        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
-        ctx.fill();
+    //     ctx.beginPath();
+    //     ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
+    //     ctx.fill();
 
-        boomX += 10
+    //     boomX += 10
 
-        if (boomCounter > 3) {
-          boomCounter = 0;
-          boomSpriteX += 25;
-          if (boomSpriteX > 375) {
-            boomSpriteX = 327.5
-          }
-        } else {
-          boomCounter += 1;
-        }
-      }
+    //     if (boomCounter > 3) {
+    //       boomCounter = 0;
+    //       boomSpriteX += 25;
+    //       if (boomSpriteX > 375) {
+    //         boomSpriteX = 327.5
+    //       }
+    //     } else {
+    //       boomCounter += 1;
+    //     }
+    //   }
 
-      else {
-        boomX = 52;
-        firing = false;
-        controller.fire = false;
-      }
+    //   else {
+    //     boomX = 52;
+    //     firing = false;
+    //     controller.fire = false;
+    //   }
 
-      window.requestAnimationFrame(handleBoomerang);
+    //   window.requestAnimationFrame(handleBoomerang);
 
-      if (boomX > 875) {
-        firing = false;
-      }
-    }
+    //   if (boomX > 875) {
+    //     firing = false;
+    //   }
+    // }
 
     //LOOP FUNCTION (COLLISION)
 
@@ -498,12 +494,6 @@
 
       //ENEMY COLLISION
 
-      // if (rectangle.x >= enemyX && rectangle.x <= enemyX + 50) {
-      //   if (rectangle.y + 10 >= enemyY && rectangle.y <= enemyY) {
-      //     console.log('enemy hit!');
-      //     gameOver = true;
-      //   }
-      // }
 
       ctx.drawImage(enemy, 160, 7, 25, 25, 1075 + enemyX, randomEnemyY + enemyY, 70, 50);
 
@@ -784,7 +774,7 @@
         handleBoomerang();
       }
       drawLink();
-      handleBoomerang();
+      // handleBoomerang();
       drawSpikes();
       triforcePiece();
       lifeCounter();
@@ -792,7 +782,7 @@
       loop();
 
     }
-
+    handleSpinAttack();
     introScreenTwo();
     sideBars();
     // game();
