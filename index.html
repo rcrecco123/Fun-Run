@@ -373,17 +373,21 @@
       keyListener: function (event) {
 
         var key_state = event.type == "keydown" ? true : false;
+        var keyUp = event.type == "keyup" ? true : false;
 
         switch (event.keyCode) {
           case 38:
             controller.up = key_state;
             break;
           case 32:
-            controller.fire = key_state;
-            console.log('fire');
-            firing = true;
-            let bY = rectangle.y;
-            break;
+            if (!keyUp) {
+              key_state = false;
+              controller.fire = key_state;
+              console.log('fire');
+              firing = true;
+              let bY = rectangle.y;
+              break;
+            }
         }
       }
     };
@@ -527,23 +531,40 @@
       megamanSprite.src = megaman;
 
 
-
+      spinCounter = 0;
 
       if (firing) {
+        var spriteSpinX = 192;
 
-        while (spinCounter < 1000) {
-          ctx.beginPath();
-          ctx.drawImage(spinAttack, 192, 192, 25, 25, rectangle.x, rectangle.y, 50, 50);
-          ctx.fill();
-          ctx.closePath();
+        ctx.beginPath();
+        ctx.drawImage(spinAttack, spriteSpinX, 192, 25, 25, rectangle.x, rectangle.y, 50, 50);
+        ctx.fill();
+        ctx.closePath();
 
-          spinCounter += 1;
+        spinCounter += 1;
+        spinTime = 0;
+
+        if (spriteSpinX < 350) {
+          spinTime += 1;
+          if (spinTime > 300) {
+            spriteSpinX += 60;
+            spriteSpinX = 192
+          }
+          console.log("GET IT~")
         }
+
+
+
         firing = false;
-        spinCounter = 0;
+        spriteSpinX = 192;
+
+        console.log(`${spriteSpinX}`);
+        spinCounter += 1;
+
       }
 
       else {
+
         ctx.beginPath();
         ctx.drawImage(
           megamanSprite,
@@ -566,6 +587,8 @@
         }
 
         spriteTime += 1;
+        firing = false;
+        spinCounter = 0;
       }
 
       window.requestAnimationFrame(drawLink);
