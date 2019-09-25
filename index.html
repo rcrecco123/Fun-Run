@@ -393,14 +393,19 @@
     let spinAttack = new Image;
     spinAttack.src = "graphics/link_reversed.gif";
 
-    function handleSpinAttack() {
-      ctx.beginPath();
-      ctx.drawImage(spinAttack, 137, 173, 25, 25, 100, 100, 25, 25);
-      ctx.fill();
-      ctx.closePath();
+    // function handleSpinAttack() {
+    //   if (firing) {
 
-      window.requestAnimationFrame(handleSpinAttack);
-    }
+    //     ctx.beginPath();
+    //     ctx.drawImage(spinAttack, 200, 200, 25, 25, 100, 100, 25, 25);
+    //     ctx.fill();
+    //     ctx.closePath();
+
+    //   }
+
+
+    //   window.requestAnimationFrame(handleSpinAttack);
+    // }
 
     //BOOMERANG LOGIC
 
@@ -514,35 +519,54 @@
     let spriteX = 235;
 
     let spriteTime = 0;
-
+    let spinCounter = 0;
     function drawLink() {
       var megaman =
         "graphics/link.png";
       var megamanSprite = new Image();
       megamanSprite.src = megaman;
 
-      ctx.beginPath();
-      ctx.drawImage(
-        megamanSprite,
-        spriteX,
-        119,
-        25,
-        25,
-        rectangle.x,
-        rectangle.y,
-        50,
-        50
-      );
-      ctx.fill();
 
-      if (spriteX >= 355) {
-        spriteX = 235;
-      } else if (spriteTime >= 10) {
-        spriteX += 60;
-        spriteTime = 0;
+
+
+      if (firing) {
+
+        while (spinCounter < 1000) {
+          ctx.beginPath();
+          ctx.drawImage(spinAttack, 192, 192, 25, 25, rectangle.x, rectangle.y, 50, 50);
+          ctx.fill();
+          ctx.closePath();
+
+          spinCounter += 1;
+        }
+        firing = false;
+        spinCounter = 0;
       }
 
-      spriteTime += 1;
+      else {
+        ctx.beginPath();
+        ctx.drawImage(
+          megamanSprite,
+          spriteX,
+          119,
+          25,
+          25,
+          rectangle.x,
+          rectangle.y,
+          50,
+          50
+        );
+        ctx.fill();
+
+        if (spriteX >= 355) {
+          spriteX = 235;
+        } else if (spriteTime >= 10) {
+          spriteX += 60;
+          spriteTime = 0;
+        }
+
+        spriteTime += 1;
+      }
 
       window.requestAnimationFrame(drawLink);
     }
@@ -774,6 +798,7 @@
         handleBoomerang();
       }
       drawLink();
+      // handleSpinAttack();
       // handleBoomerang();
       drawSpikes();
       triforcePiece();
@@ -782,7 +807,7 @@
       loop();
 
     }
-    handleSpinAttack();
+
     introScreenTwo();
     sideBars();
     // game();
