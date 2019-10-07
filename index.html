@@ -6,8 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-  <script></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script> -->
+  <iframe src="Megaman II Music Quick Man.mp3" allow="autoplay" style="display:none" type="audio/mpeg" id="iframeAudio">
+  </iframe>
+  <audio type="audio/mp3" autoplay loop id="playAudio">
+    <source src="Megaman II Music Quick Man.mp3">
+  </audio>
+
+  <script>
+    var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    if (!isChrome) {
+      document.getElementById('iframeAudio').remove()
+    }
+    else {
+      document.getElementById('playAudio').remove() //just to make sure that it will not have 2x audio in the background 
+    }
+
+  </script>
+
   <title>Fun Run</title>
 </head>
 
@@ -32,7 +47,11 @@
 
   </canvas>
 
+  <audio src="Megaman II Music Quick Man.mp3" loop="loop" id="audio1"></audio>
+
   <script>
+
+
 
     document.body.style.position = "absolute";
 
@@ -57,7 +76,7 @@
       leftCtx.fillText('CONTROLS', 15, 25);
 
       leftCtx.fillText("SPACE BAR:", 10, 60)
-      leftCtx.fillText("Boomerang", 10, 82)
+      leftCtx.fillText("Sword Attack", 10, 82)
 
       leftCtx.fillText("UP ARROW:", 10, 110)
       leftCtx.fillText("Jump", 10, 130)
@@ -82,7 +101,7 @@
 
       rightCtx.fillText("-Avoid obstacles", 2, 110);
 
-      rightCtx.fillText("-Shoot boomerang", 2, 135);
+      rightCtx.fillText("-Sword Attack", 2, 135);
 
       rightCtx.fillText("-Keep running!", 2, 160);
 
@@ -171,7 +190,7 @@
       introCtx.fillText("UP ARROW: Jump", 40, 60)
 
       introCtx.font = "25px Arial";
-      introCtx.fillText("SPACE BAR: Boomerang", 40, 95)
+      introCtx.fillText("SPACE BAR: Sword Attack", 40, 95)
 
       // introCtx.rect(20, 20, 150, 100);
       // introCtx.stroke();
@@ -198,7 +217,7 @@
       ctx.fillText("UP ARROW: Jump", 40, 60)
 
       ctx.font = "25px Arial";
-      ctx.fillText("SPACE BAR: Boomerang", 40, 95)
+      ctx.fillText("SPACE BAR: Sword Attack", 40, 95)
 
       // if the mouse is within the width and height of the text, when mouse is clicked, clears the intro screen.
 
@@ -338,7 +357,7 @@
         if (mousePos.y > 265 && mousePos.y < 295) {
           if (startScreen = true) {
             if (controller.click = true && screenCount < 1) {
-              console.log("START GAME!!!");
+              // console.log("START GAME!!!");
               bigGameLoop();
               startScreen = false;
               screenCount = + 1;
@@ -361,33 +380,31 @@
       x: 0
     }
 
-    var firing = false;
+    let firing = false;
 
     controller = {
       up: false,
       left: false,
       down: false,
       right: false,
-      fire: false,
+      spinning: false,
       click: false,
       keyListener: function (event) {
 
         var key_state = event.type == "keydown" ? true : false;
-        var keyUp = event.type == "keyup" ? true : false;
+        // var keyUp = event.type == "keyup" ? true : false;
 
         switch (event.keyCode) {
           case 38:
             controller.up = key_state;
             break;
           case 32:
-            if (!keyUp) {
-              key_state = false;
-              controller.fire = key_state;
-              console.log('fire');
-              firing = true;
-              let bY = rectangle.y;
-              break;
+            if (key_state) {
+              controller.spinning = key_state;
+              // console.log('spinning');
             }
+            break;
+
         }
       }
     };
@@ -411,61 +428,65 @@
     //   window.requestAnimationFrame(handleSpinAttack);
     // }
 
-    //BOOMERANG LOGIC
+    // BOOMERANG LOGIC
 
-    // var boomX = 52;
-    // var boomerangImg = new Image;
-    // boomerangImg.src = "graphics/link-2.gif";
+    var boomX = 52;
+    var boomerangImg = new Image;
+    boomerangImg.src = "graphics/link-2.gif";
 
-    // let boomSpriteX = 327.5
-    // let boomSpriteY = 253
+    let boomSpriteX = 327.5
+    let boomSpriteY = 253
 
-    // let boomCounter = 0;
+    let boomCounter = 0;
 
-    // function handleBoomerang() {
+    function handleBoomerang() {
 
-    //   if (firing == true) {
-    //     let boomY = rectangle.y;
+      if (firing == true) {
+        let boomY = rectangle.y;
 
-    //     boomY -= -(boomY - rectangle.y);
 
-    //     ctx.beginPath();
-    //     ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
-    //     ctx.fill();
 
-    //     boomX += 10
+        ctx.beginPath();
+        ctx.drawImage(boomerangImg, boomSpriteX, boomSpriteY, 12, 15, rectangle.x + boomX, boomY, 30, 30);
+        ctx.fill();
 
-    //     if (boomCounter > 3) {
-    //       boomCounter = 0;
-    //       boomSpriteX += 25;
-    //       if (boomSpriteX > 375) {
-    //         boomSpriteX = 327.5
-    //       }
-    //     } else {
-    //       boomCounter += 1;
-    //     }
-    //   }
+        boomX += 10
 
-    //   else {
-    //     boomX = 52;
-    //     firing = false;
-    //     controller.fire = false;
-    //   }
+        if (boomCounter > 3) {
+          boomCounter = 0;
+          boomSpriteX += 25;
+          if (boomSpriteX > 375) {
+            boomSpriteX = 327.5
+          }
+        } else {
+          boomCounter += 1;
+        }
+      }
 
-    //   window.requestAnimationFrame(handleBoomerang);
+      // else {
+      //   boomCounter += 1;
+      // }
+      if (boomX > 875) {
+        firing = false;
+      }
 
-    //   if (boomX > 875) {
-    //     firing = false;
-    //   }
-    // }
+      window.requestAnimationFrame(handleBoomerang);
+
+    }
 
     //LOOP FUNCTION (COLLISION)
-
+    let justLanded = false;
     loop = function () {
-      if (controller.up && rectangle.jumping == false) {
+
+      if (justLanded) {
+        justLanded = false;
+      }
+
+      if (controller.up && rectangle.jumping == false && !justLanded) {
         rectangle.y_velocity -= 40;
         rectangle.jumping = true;
         rectangle.jumps += 1;
+        justLanded = false;
       }
 
       rectangle.y_velocity += 2.9; //gravity
@@ -486,6 +507,7 @@
       if (rectangle.x >= platformX && rectangle.x < platformX + 350) {
         if (rectangle.y + 47 >= platformY && rectangle.y <= platformY - 5) {
           rectangle.y_velocity = -3;
+          justLanded = true;
           // rectangle.y = platformY - 38;
           rectangle.jumping = false;
         }
@@ -508,11 +530,16 @@
 
       if (rectangle.x > 1075 + enemyX && rectangle.x < 1075 + enemyX + 30) {
         if (rectangle.y + 47 >= randomEnemyY + enemyY && rectangle.y <= randomEnemyY + enemyY - 5) {
-          console.log("enemy HIT!!!!");
-          enemyX = 0;
-          enemyY = 0;
-          lifeCount -= 4.5;
-
+          if (controller.spinning == true) {
+            // console.log("enemy attacked!!!!");
+            enemyX = 0;
+            enemyY = 0;
+            scoreCounter += 250;
+          }
+          else {
+            // console.log("enemy hit!!!!");
+            lifeCount -= 4.5;
+          }
         }
       }
 
@@ -524,47 +551,17 @@
 
     let spriteTime = 0;
     let spinCounter = 0;
+
+    spinCounter = 0;
+    spinX = 194.25;
+
     function drawLink() {
       var megaman =
         "graphics/link.png";
       var megamanSprite = new Image();
       megamanSprite.src = megaman;
 
-
-      spinCounter = 0;
-
-      if (firing) {
-        var spriteSpinX = 192;
-
-        ctx.beginPath();
-        ctx.drawImage(spinAttack, spriteSpinX, 192, 25, 25, rectangle.x, rectangle.y, 50, 50);
-        ctx.fill();
-        ctx.closePath();
-
-        spinCounter += 1;
-        spinTime = 0;
-
-        if (spriteSpinX < 350) {
-          spinTime += 1;
-          if (spinTime > 300) {
-            spriteSpinX += 60;
-            spriteSpinX = 192
-          }
-          console.log("GET IT~")
-        }
-
-
-
-        firing = false;
-        spriteSpinX = 192;
-
-        console.log(`${spriteSpinX}`);
-        spinCounter += 1;
-
-      }
-
-      else {
-
+      if (controller.spinning == false) {
         ctx.beginPath();
         ctx.drawImage(
           megamanSprite,
@@ -578,20 +575,57 @@
           50
         );
         ctx.fill();
-
-        if (spriteX >= 355) {
-          spriteX = 235;
-        } else if (spriteTime >= 10) {
-          spriteX += 60;
-          spriteTime = 0;
-        }
-
-        spriteTime += 1;
-        firing = false;
-        spinCounter = 0;
       }
 
+      if (spriteX >= 355) {
+        spriteX = 235;
+      } else if (spriteTime >= 10) {
+        spriteX += 60;
+        spriteTime = 0;
+      }
+
+
+      spriteTime += 1;
+      firing = false;
+      spinCounter = 0;
+      spinX = 194.25;
       window.requestAnimationFrame(drawLink);
+    }
+
+    //SPIN ATTACK
+    masterSpinCounter = 0;
+    spinningCounter = 0;
+    let spinningX = 194.25;
+    function handleSpin() {
+
+      if (controller.spinning) {
+        ctx.beginPath();
+        ctx.drawImage(spinAttack, spinningX, 190, 28, 40, rectangle.x, rectangle.y, 60, 85);
+        ctx.fill();
+        ctx.closePath();
+
+        if (spinningCounter > 5) {
+          spinningX += 59;
+          spinningCounter = 0;
+        }
+
+        if (spinningX > 299) {
+          spinningX = 194.25;
+        }
+
+        if (masterSpinCounter > 20) {
+          masterSpinCounter = 0;
+          controller.spinning = false;
+          // console.log("spinning = FALSE");
+        }
+        spinX += 60;
+        spinningCounter += 1;
+        // console.log(`${spinningCounter}`)
+        masterSpinCounter += 2;
+      }
+
+      window.requestAnimationFrame(handleSpin);
+
     }
 
     //ENEMIES HANDLER
@@ -642,7 +676,7 @@
 
       if (rectangle.x >= enemyX && rectangle.x <= enemyX + 70) {
         if (rectangle.y >= enemyY && rectangle.y <= enemyY + 50) {
-          console.log("ENEMY GONE");
+          // console.log("ENEMY GONE");
 
           enemyX = 0;
           enemyY = 0;
@@ -730,8 +764,8 @@
 
       ctx.font = "20px Lucida Console"
       ctx.fillStyle = "gray";
-      ctx.fillText(`Score: ${scoreCounter}`, 825, 425);
-      ctx.fillText(`Life: ${lifeCount}`, 400, 425);
+      ctx.fillText(`Score: ${scoreCounter} `, 825, 425);
+      ctx.fillText(`Life: ${lifeCount} `, 400, 425);
       ctx.fillText(`Shards Collected: ${collectCount}`, 25, 425);
 
       scoreCounter += 1;
@@ -769,7 +803,7 @@
     }
 
     function endGameLoop() {
-      console.log("GAME OVER pHr33K!!!!")
+      // console.log("GAME OVER pHr33K!!!!")
       ctx.beginPath();
 
       ctx.drawImage(introBackground, 0, 0);
@@ -794,8 +828,8 @@
     canvas.addEventListener("click", function (evt) {
       var mousePos = getMousePos(canvas, evt);
 
-      if (mousePos.x > 335 && mousePos.x < 375) {
-        if (mousePos.y > 125 && mousePos.y < 145) {
+      if (mousePos.x > 0 && mousePos.x < ctx.height) {
+        if (mousePos.y > 0 && mousePos.y < ctx.width) {
           if (controller.click = true) {
             location.reload();
 
@@ -813,30 +847,25 @@
     // document.addEventListener("mousemove", mouseMoveHandler, false);
 
     function bigGameLoop() {
+      if (startScreen == true) {
+        handleEnemy();
+        start();
+        drawSpikes();
+        drawPlatform();
 
-      start();
-      handleEnemy();
-      drawPlatform();
-      if (firing == true) {
         handleBoomerang();
-      }
-      drawLink();
-      // handleSpinAttack();
-      // handleBoomerang();
-      drawSpikes();
-      triforcePiece();
-      lifeCounter();
-      scoreText();
-      loop();
 
+        drawLink();
+        handleSpin();
+        triforcePiece();
+        lifeCounter();
+        scoreText();
+        loop();
+      }
     }
 
     introScreenTwo();
     sideBars();
-    // game();
-
-    //Score
-    //look into using a master "draw" function
 
   </script>
 </body>
